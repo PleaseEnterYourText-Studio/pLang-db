@@ -1,0 +1,4 @@
+node_modules/
+*.tgz
+bin/pdb
+bin/pdb.exe

@@ -1,0 +1,24 @@
+{
+  "name": "@peyt/pdb",
+  "displayName": "pdb",
+  "description": "pdb - PLang debugger, GDB-style CLI on liblldb",
+  "version": "0.0.1",
+  "license": "AGPL-3.0",
+  "author": "PeYT",
+  "contributors": ["ieshishinjin", "Carry-Rao", "MaherJon"],
+  "homepage": "https://github.com/PleaseEnterYourText-Studio/pLang-db",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PleaseEnterYourText-Studio/pLang-db.git"
+  },
+  "keywords": ["pdb", "plang", "debugger", "lldb", "gdb"],
+  "bin": {
+    "pdb": "./bin/pdb"
+  },
+  "files": ["bin", "postinstall.js", "README.md"],
+  "scripts": {
+    "postinstall": "node postinstall.js",
+    "prepublishOnly": "node scripts/build-package.js"
+  },
+  "os": ["darwin", "linux", "win32"]
+}
