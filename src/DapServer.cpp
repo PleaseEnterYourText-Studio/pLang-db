@@ -53,6 +53,18 @@ void DapServer::sendResponse(int seq, const std::string& command, const llvm::js
     sendMessage(jsonToString(llvm::json::Value(std::move(obj))));
 }
 
+void DapServer::sendError(int seq, const std::string& message)
+{
+    llvm::json::Object obj;
+    obj["seq"] = 0;
+    obj["type"] = "response";
+    obj["request_seq"] = seq;
+    obj["success"] = false;
+    obj["command"] = "launch";
+    obj["message"] = message;
+    sendMessage(jsonToString(llvm::json::Value(std::move(obj))));
+}
+
 void DapServer::sendEvent(const std::string& event, const llvm::json::Value& body)
 {
     llvm::json::Object obj;
@@ -359,7 +371,7 @@ llvm::json::Value DapServer::doEvaluate(const llvm::json::Object* args)
 llvm::json::Value DapServer::handleRequest(const std::string& command, const llvm::json::Object* args)
 {
     if (command == "initialize") return doInitialize();
-    if (command == "launch") return doLaunch(args) ? nullptr : llvm::json::Value(false);
+    if (command == "launch") return doLaunch(args) ? llvm::json::Value("ok") : llvm::json::Value("failed");
     if (command == "setBreakpoints") return doSetBreakpoints(args);
     if (command == "configurationDone") return nullptr;
     if (command == "threads") return doThreads();
@@ -395,7 +407,11 @@ void DapServer::run()
             if (command && seq)
             {
                 auto result = handleRequest(command->str(), args);
-                sendResponse((int)*seq, command->str(), result);
+                if (*command == "launch" && result.getAsString() &&
+                    *result.getAsString() == "failed")
+                    sendError((int)*seq, "launch failed: cannot create target");
+                else
+                    sendResponse((int)*seq, command->str(), result);
                 // 执行类命令：响应已发，再执行并广播状态
                 if (*command == "configurationDone")
                 {

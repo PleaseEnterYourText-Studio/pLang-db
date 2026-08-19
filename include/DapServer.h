@@ -19,6 +19,7 @@ private:
     std::string readMessage();
     void sendMessage(const std::string& body);
     void sendResponse(int seq, const std::string& command, const llvm::json::Value& body);
+    void sendError(int seq, const std::string& message);
     void sendEvent(const std::string& event, const llvm::json::Value& body);
 
     // ---- DAP 方法 ----
