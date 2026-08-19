@@ -75,6 +75,17 @@ if(NOT LLDB_LIBRARY)
 endif()
 message(STATUS "   LLDB library: ${LLDB_LIBRARY}")
 
+# llvm::json 序列化依赖 libLLVM 符号，需显式链接
+find_library(LLVM_SHARED_LIBRARY
+    NAMES LLVM libLLVM LLVM.dll
+    PATHS "${LLDB_LIBRARY_DIR}" "${LLVM_PREFIX}/lib"
+    NO_DEFAULT_PATH
+)
+if(NOT LLVM_SHARED_LIBRARY)
+    message(FATAL_ERROR "libLLVM not found under ${LLDB_LIBRARY_DIR}")
+endif()
+message(STATUS "   LLVM library: ${LLVM_SHARED_LIBRARY}")
+
 # ------------------------------------------------------------------
 # pdb 可执行文件
 # ------------------------------------------------------------------
@@ -82,6 +93,8 @@ add_executable(pdb
     src/main.cpp
     src/DebugSession.cpp
     include/DebugSession.h
+    src/DapServer.cpp
+    include/DapServer.h
 )
 
 target_include_directories(pdb PRIVATE
@@ -89,7 +102,7 @@ target_include_directories(pdb PRIVATE
     ${LLDB_INCLUDE_DIR}
 )
 
-target_link_libraries(pdb PRIVATE ${LLDB_LIBRARY})
+target_link_libraries(pdb PRIVATE ${LLDB_LIBRARY} ${LLVM_SHARED_LIBRARY})
 
 # macOS：liblldb 的依赖（curses/z/xml2 等）由 dylib 内部解析，这里补 rpath
 if(APPLE)

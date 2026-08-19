@@ -7,6 +7,7 @@
 #include <sstream>
 #include <cstdlib>
 #include "DebugSession.h"
+#include "DapServer.h"
 
 static std::vector<std::string> splitArgs(const std::string& line)
 {
@@ -45,6 +46,15 @@ int main(int argc, char* argv[])
     {
         std::cerr << "usage: pdb <executable>\n";
         return 1;
+    }
+    // DAP 模式：pdb --dap [program]
+    if (argc >= 2 && std::string(argv[1]) == "--dap")
+    {
+        lldb::SBDebugger::Initialize();
+        DapServer server;
+        server.run();
+        lldb::SBDebugger::Terminate();
+        return 0;
     }
     std::string exe = argv[1];
 
