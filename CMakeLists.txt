@@ -80,6 +80,8 @@ message(STATUS "   LLDB library: ${LLDB_LIBRARY}")
 # ------------------------------------------------------------------
 add_executable(pdb
     src/main.cpp
+    src/DebugSession.cpp
+    include/DebugSession.h
 )
 
 target_include_directories(pdb PRIVATE
